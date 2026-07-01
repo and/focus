@@ -196,6 +196,19 @@ struct MenuBarView: View {
                 }
                 .buttonStyle(MenuButtonStyle())
             }
+
+            Divider()
+
+            HStack(alignment: .top, spacing: 4) {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 9))
+                Text("All data stays on this Mac — nothing is ever uploaded")
+                    .font(.system(size: 10, design: .rounded))
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(16)
         .frame(width: 280)

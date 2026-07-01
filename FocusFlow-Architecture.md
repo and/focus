@@ -24,8 +24,9 @@ FocusFlow/
 │   │   └── AppState.swift                  # Global app state (ObservableObject)
 │   │
 │   ├── Tracking/
-│   │   ├── ActivityTracker.swift           # Core tracking engine (NSWorkspace, accessibility)
-│   │   ├── AppSwitchDetector.swift         # Monitors active app changes
+│   │   ├── ActivityTracker.swift           # Core tracking engine (NSWorkspace, accessibility);
+│   │   │                                     also owns app-switch detection (AppSwitchDetector was
+│   │   │                                     folded in here rather than kept as a separate file)
 │   │   ├── IdleDetector.swift              # Detects user idle time (CGEventSource)
 │   │   ├── BrowserTitleObserver.swift      # Reads browser tab titles via accessibility
 │   │   └── PermissionsManager.swift        # Checks & requests accessibility permissions
@@ -107,11 +108,11 @@ Responsibilities:
 - `NSWorkspace.shared.frontmostApplication` — get the currently active app
 - `CGEventSource.secondsSinceLastEventType(.combinedSessionState, .any)` — detect idle time
 
-#### AppSwitchDetector.swift
+#### App-switch detection (implemented inside `ActivityTracker.swift`)
 
 ```
 Inputs:  NSWorkspace notifications
-Outputs: Stream of (bundleID, appName, windowTitle, timestamp) tuples
+Outputs: ActivityEvent records persisted via EventStore
 
 Logic:
 1. Subscribe to NSWorkspace.didActivateApplicationNotification
@@ -120,7 +121,8 @@ Logic:
    - localized app name
    - Window title via AXUIElement (accessibility API)
    - Timestamp
-3. Emit as ActivityEvent
+3. Categorize via AppCategorizer and persist as an ActivityEvent
+4. Recalculate the focus score immediately after every switch
 ```
 
 #### IdleDetector.swift
@@ -352,12 +354,16 @@ struct DailyScore: Codable, FetchableRecord, PersistableRecord {
 The app lives in the macOS menu bar. Clicking the icon shows a dropdown.
 
 ```
-Menu Bar Icon: SF Symbol "brain.head.profile" or custom icon that changes color based on focus level
-  - Deep Focus: green
-  - Focused: blue
-  - Moderate: yellow
-  - Scattered: orange
-  - Distracted: red
+Menu Bar Icon: SF Symbol "brain.head.profile", rendered as a template image with the
+live focus score as text next to it (e.g. "🧠 78"), so the score is visible at a
+glance without opening the dropdown.
+
+Note: as implemented, the icon and score text use the system's default template
+rendering (matching light/dark mode and translucent-over-wallpaper menu bars,
+same as every other menu bar item) rather than the color-per-level scheme
+originally specified below — a fixed tint color looked inconsistent against the
+system's automatic menu bar appearance. Level-based color is still used in the
+Dashboard/popover UI.
 
 Dropdown contents:
   ┌──────────────────────────────┐
@@ -489,11 +495,11 @@ Step 4: Ready
 
 ```
 Package.swift / SPM dependencies:
-- GRDB.swift (SQLite wrapper)          — https://github.com/groue/GRDB.swift
+- GRDB.swift (SQLite wrapper)          — https://github.com/groue/GRDB.swift (from: 6.29.1)
 - Charts (if not using SwiftUI Charts) — native in macOS 14+, use SwiftUI Charts
-- LaunchAtLogin                        — https://github.com/sindresorhus/LaunchAtLogin-Modern
-- KeyboardShortcuts                    — https://github.com/sindresorhus/KeyboardShortcuts
-- Sparkle (for auto-updates)           — https://github.com/sparkle-project/Sparkle
+- LaunchAtLogin                        — https://github.com/sindresorhus/LaunchAtLogin-Modern (from: 1.1.0 — 2.0.0 does not exist upstream)
+- KeyboardShortcuts                    — https://github.com/sindresorhus/KeyboardShortcuts (from: 2.2.0)
+- Sparkle (for auto-updates)           — https://github.com/sparkle-project/Sparkle (from: 2.6.3)
 
 System frameworks:
 - ApplicationServices (AXUIElement)
@@ -580,6 +586,32 @@ Build in this sequence — each phase produces a working, testable app:
 - User can pause/stop tracking at any time
 - User can delete all data from Settings
 - Clear privacy explanation during onboarding
+```
+
+---
+
+## Implementation Status
+
+```
+Done:
+- Phase 1: Skeleton + menu bar app + permissions + app-switch/idle tracking
+- Phase 2: GRDB storage, AppCategorizer, FocusScoreEngine, live score in menu bar
+- Phase 3: Dashboard (Today + History tabs), gauge/timeline/breakdown/trend/heatmap views
+- Phase 4: BrowserTitleObserver + keyword categorization, Settings, FocusAlertManager,
+  DailySummaryNotifier, Onboarding flow
+- Starter unit test suite: FocusFlowTests/{ScoringTests,CategorizerTests,TrackerTests}.swift
+- CSV export, data retention cleanup on launch, LaunchAtLogin, Sparkle wired in
+
+Not done (needs human input, not just code):
+- Developer ID signing / notarization (requires an Apple Developer Team ID)
+- Sparkle appcast feed URL (no update feed configured yet)
+- App icon asset
+- DMG installer packaging
+
+Known deviations from the original spec:
+- AppSwitchDetector was folded into ActivityTracker.swift instead of staying a separate file
+- Menu bar icon uses theme-adaptive (template) rendering with the live score as text,
+  rather than a fixed color per focus level — see the Menu Bar section above
 ```
 
 ---

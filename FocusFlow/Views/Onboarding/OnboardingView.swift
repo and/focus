@@ -92,9 +92,21 @@ struct OnboardingView: View {
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
+
+            HStack(spacing: 6) {
+                Image(systemName: "lock.fill")
+                Text("100% local — your activity data never leaves this Mac. No cloud, no accounts, no analytics.")
+            }
+            .font(.system(.caption, design: .rounded))
+            .fontWeight(.medium)
+            .foregroundColor(.green)
+            .multilineTextAlignment(.center)
+            .padding(10)
+            .background(Color.green.opacity(0.1))
+            .cornerRadius(8)
         }
     }
-    
+
     private var permissionsView: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Grant Permissions")

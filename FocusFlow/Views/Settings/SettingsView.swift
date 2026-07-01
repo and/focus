@@ -170,7 +170,18 @@ struct SettingsView: View {
                     .font(.system(size: 11, weight: .bold, design: .rounded))
                     .foregroundColor(.secondary)
                     .tracking(1.0)
-                
+
+                HStack(spacing: 6) {
+                    Image(systemName: "lock.fill")
+                        .foregroundColor(.green)
+                    Text("Everything below lives only in a local SQLite database on this Mac. FocusFlow makes no network requests and sends nothing anywhere.")
+                        .font(.system(.caption, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+                .padding(8)
+                .background(Color.green.opacity(0.08))
+                .cornerRadius(6)
+
                 HStack(spacing: 16) {
                     Button(action: exportToCSV) {
                         HStack {
@@ -179,7 +190,15 @@ struct SettingsView: View {
                         }
                     }
                     .buttonStyle(.bordered)
-                    
+
+                    Button(action: revealDataInFinder) {
+                        HStack {
+                            Image(systemName: "folder")
+                            Text("Show Data Folder in Finder")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+
                     Button(action: clearAllData) {
                         HStack {
                             Image(systemName: "trash")
@@ -244,6 +263,12 @@ struct SettingsView: View {
         }
     }
     
+    private func revealDataInFinder() {
+        let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let focusFlowURL = appSupportURL.appendingPathComponent("FocusFlow", isDirectory: true)
+        NSWorkspace.shared.activateFileViewerSelecting([focusFlowURL])
+    }
+
     private func clearAllData() {
         let alert = NSAlert()
         alert.messageText = "Clear All Data?"
