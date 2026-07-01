@@ -1,0 +1,37 @@
+{
+  "productive": [
+    "com.apple.dt.Xcode",
+    "com.microsoft.VSCode",
+    "com.sublimetext.*",
+    "com.jetbrains.*",
+    "com.apple.iWork.*",
+    "com.microsoft.Word",
+    "com.microsoft.Excel",
+    "com.microsoft.PowerPoint",
+    "com.figma.Desktop",
+    "com.linear",
+    "com.notion.id",
+    "com.obsidian"
+  ],
+  "communication": [
+    "com.tinyspeck.slackmacgap",
+    "com.apple.mail",
+    "com.microsoft.Outlook",
+    "us.zoom.xos",
+    "com.microsoft.teams*"
+  ],
+  "distracting": [
+    "com.twitter.*",
+    "com.facebook.*",
+    "com.reddit.*",
+    "com.spotify.client",
+    "com.apple.Music",
+    "tv.twitch.studio"
+  ],
+  "neutral": [
+    "com.apple.finder",
+    "com.apple.systempreferences",
+    "com.apple.calculator",
+    "com.apple.Preview"
+  ]
+}

@@ -151,7 +151,9 @@ struct MenuBarView: View {
             // Action Buttons
             VStack(spacing: 6) {
                 Button(action: {
-                    print("Open Dashboard clicked")
+                    if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+                        appDelegate.openDashboardWindow()
+                    }
                 }) {
                     HStack {
                         Image(systemName: "macwindow")
