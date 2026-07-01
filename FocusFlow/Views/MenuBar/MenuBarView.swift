@@ -103,7 +103,7 @@ struct MenuBarView: View {
                 Spacer()
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("SWITCHES")
+                    Text("SWITCHES (1H)")
                         .font(.system(size: 9, weight: .bold, design: .rounded))
                         .foregroundColor(.secondary)
                     Text("\(appState.switchesCount)")
@@ -151,9 +151,7 @@ struct MenuBarView: View {
             // Action Buttons
             VStack(spacing: 6) {
                 Button(action: {
-                    if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
-                        appDelegate.openDashboardWindow()
-                    }
+                    AppDelegate.shared?.openDashboardWindow()
                 }) {
                     HStack {
                         Image(systemName: "macwindow")

@@ -43,6 +43,12 @@ struct DashboardView: View {
         .onAppear {
             loadDashboardData()
         }
+        .onChange(of: selectedTab) { _ in
+            loadDashboardData()
+        }
+        .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { _ in
+            loadDashboardData()
+        }
     }
     
     private var todayTabView: some View {

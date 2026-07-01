@@ -62,9 +62,58 @@ struct SettingsView: View {
             }
             .padding(.horizontal)
             .padding(.top)
-            
+
             Divider()
-            
+
+            // Data Management
+            VStack(alignment: .leading, spacing: 12) {
+                Text("DATA MANAGEMENT")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundColor(.secondary)
+                    .tracking(1.0)
+
+                HStack(spacing: 6) {
+                    Image(systemName: "lock.fill")
+                        .foregroundColor(.green)
+                    Text("Everything below lives only in a local SQLite database on this Mac. FocusFlow makes no network requests and sends nothing anywhere.")
+                        .font(.system(.caption, design: .rounded))
+                        .foregroundColor(.secondary)
+                }
+                .padding(8)
+                .background(Color.green.opacity(0.08))
+                .cornerRadius(6)
+
+                HStack(spacing: 16) {
+                    Button(action: exportToCSV) {
+                        HStack {
+                            Image(systemName: "square.and.arrow.up")
+                            Text("Export Activity to CSV")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button(action: revealDataInFinder) {
+                        HStack {
+                            Image(systemName: "folder")
+                            Text("Show Data Folder in Finder")
+                        }
+                    }
+                    .buttonStyle(.bordered)
+
+                    Button(action: clearAllData) {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("Clear All Database History")
+                        }
+                        .foregroundColor(.red)
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+            .padding(.horizontal)
+
+            Divider()
+
             // Goals
             VStack(alignment: .leading, spacing: 12) {
                 Text("DAILY FOCUS GOALS")
@@ -159,55 +208,6 @@ struct SettingsView: View {
                 .padding(8)
                 .background(Color(NSColor.controlBackgroundColor))
                 .cornerRadius(8)
-            }
-            .padding(.horizontal)
-            
-            Divider()
-            
-            // Data Management
-            VStack(alignment: .leading, spacing: 12) {
-                Text("DATA MANAGEMENT")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundColor(.secondary)
-                    .tracking(1.0)
-
-                HStack(spacing: 6) {
-                    Image(systemName: "lock.fill")
-                        .foregroundColor(.green)
-                    Text("Everything below lives only in a local SQLite database on this Mac. FocusFlow makes no network requests and sends nothing anywhere.")
-                        .font(.system(.caption, design: .rounded))
-                        .foregroundColor(.secondary)
-                }
-                .padding(8)
-                .background(Color.green.opacity(0.08))
-                .cornerRadius(6)
-
-                HStack(spacing: 16) {
-                    Button(action: exportToCSV) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.up")
-                            Text("Export Activity to CSV")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button(action: revealDataInFinder) {
-                        HStack {
-                            Image(systemName: "folder")
-                            Text("Show Data Folder in Finder")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-
-                    Button(action: clearAllData) {
-                        HStack {
-                            Image(systemName: "trash")
-                            Text("Clear All Database History")
-                        }
-                        .foregroundColor(.red)
-                    }
-                    .buttonStyle(.bordered)
-                }
             }
             .padding(.horizontal)
             .padding(.bottom)

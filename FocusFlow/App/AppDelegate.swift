@@ -9,6 +9,12 @@ extension KeyboardShortcuts.Name {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // NSApplication.shared.delegate is NOT this instance: SwiftUI's
+    // @NSApplicationDelegateAdaptor installs its own internal proxy object as
+    // NSApp.delegate and forwards calls to us under the hood, so `NSApplication
+    // .shared.delegate as? AppDelegate` always fails silently. Use this instead.
+    static private(set) var shared: AppDelegate?
+
     var statusItem: NSStatusItem?
     var popover: NSPopover?
     var appState: AppState?
@@ -20,6 +26,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItemCancellable: AnyCancellable?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        AppDelegate.shared = self
+
         // Initialize AppState
         let state = AppState()
         self.appState = state
@@ -32,11 +40,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Initialize Sparkle Auto-Updater
         self.updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
         
-        // Setup popover
+        // Setup popover — size itself to fit the SwiftUI content rather than a fixed
+        // height, so conditionally-shown sections (e.g. the accessibility warning banner)
+        // don't get clipped outside the popover's clickable frame.
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: 280, height: 360)
         popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: MenuBarView(appState: state))
+        let hostingController = NSHostingController(rootView: MenuBarView(appState: state))
+        hostingController.sizingOptions = [.preferredContentSize]
+        popover.contentViewController = hostingController
         self.popover = popover
         
         // Setup status item

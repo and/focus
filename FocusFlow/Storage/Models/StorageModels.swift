@@ -26,7 +26,7 @@ struct ActivityEvent: Codable, FetchableRecord, PersistableRecord, TableRecord {
         static let durationSeconds = Column(CodingKeys.durationSeconds)
     }
     
-    static var databaseTable: String = "activityEvents"
+    static var databaseTableName: String = "activityEvents"
     
     mutating func didInsert(_ inserted: InsertionSuccess) {
         id = inserted.rowID
@@ -59,7 +59,7 @@ struct FocusSession: Codable, FetchableRecord, PersistableRecord, TableRecord {
         static let idleSeconds = Column(CodingKeys.idleSeconds)
     }
     
-    static var databaseTable: String = "focusSessions"
+    static var databaseTableName: String = "focusSessions"
     
     mutating func didInsert(_ inserted: InsertionSuccess) {
         id = inserted.rowID
@@ -103,7 +103,7 @@ struct DailyScore: Codable, FetchableRecord, PersistableRecord, TableRecord, Ide
         static let topAppsData = Column(CodingKeys.topAppsData)
     }
     
-    static var databaseTable: String = "dailyScores"
+    static var databaseTableName: String = "dailyScores"
     
     mutating func didInsert(_ inserted: InsertionSuccess) {
         id = inserted.rowID

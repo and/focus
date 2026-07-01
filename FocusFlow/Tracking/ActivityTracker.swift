@@ -88,7 +88,6 @@ class ActivityTracker: IdleDetectorDelegate {
             self.appState.activeAppName = appName
             self.appState.activeBundleID = bundleID
             self.appState.activeWindowTitle = windowTitle
-            self.appState.switchesCount += 1
         }
         
         // Persist activity event in database
@@ -138,15 +137,19 @@ class ActivityTracker: IdleDetectorDelegate {
     
     func recalculateFocusScore() {
         guard appState.isTracking else { return }
-        
-        let thirtyMinutesAgo = Date().addingTimeInterval(-30 * 60)
+
+        let oneHourAgo = Date().addingTimeInterval(-60 * 60)
         do {
-            let events = try EventStore.shared.fetchEvents(since: thirtyMinutesAgo)
-            let result = FocusScoreEngine.shared.calculateScore(events: events)
-            
+            let eventsLastHour = try EventStore.shared.fetchEvents(since: oneHourAgo)
+            let thirtyMinutesAgo = Date().addingTimeInterval(-30 * 60)
+            let eventsLastThirtyMinutes = eventsLastHour.filter { $0.timestamp >= thirtyMinutesAgo }
+            let result = FocusScoreEngine.shared.calculateScore(events: eventsLastThirtyMinutes)
+            let switchesLastHour = max(eventsLastHour.count - 1, 0)
+
             DispatchQueue.main.async {
                 self.appState.focusScore = result.score
                 self.appState.focusLevel = result.level.rawValue
+                self.appState.switchesCount = switchesLastHour
             }
         } catch {
             print("ActivityTracker: Failed to recalculate focus score: \(error)")
